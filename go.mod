@@ -1,3 +1,3 @@
-module github.com/pydronia/networking-experiments
+module github.com/pydronia/kubaru
 
 go 1.24.4

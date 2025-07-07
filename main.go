@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pydronia/networking-experiments/internal/netutils"
+	"github.com/pydronia/kubaru/internal/netutils"
 )
 
 // TODO:
