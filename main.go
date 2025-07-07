@@ -19,7 +19,6 @@ import (
 )
 
 // TODO:
-// - Rename github project/imports
 // - Support credentials from an env or file
 // - Tidy up command line arguments, usage, user/password setting.
 // - improve network stuff (cleaner tls generation, generate based on actual ips? Maybe have a separete commandline flag to generate instead of asking for input)
