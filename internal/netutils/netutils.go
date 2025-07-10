@@ -23,7 +23,7 @@ func BasicAuthMiddleware(user, pass string, handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
+			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted", charset="UTF-8"`)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
@@ -42,7 +42,7 @@ func BasicAuthMiddleware(user, pass string, handler http.Handler) http.Handler {
 
 		correctCredentials := []byte(user + ":" + pass)
 		if subtle.ConstantTimeCompare(correctCredentials, decodedBytes) == 0 {
-			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
+			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted", charset="UTF-8"`)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}

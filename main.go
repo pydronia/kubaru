@@ -19,7 +19,7 @@ import (
 )
 
 // TODO:
-// - Support credentials from env (KUBARU_USER, KUBARU_PASS)
+// - Write random password generator
 // - Tidy up command line arguments, usage, user/password setting.
 // - improve network stuff (cleaner tls generation, generate based on actual ips? Maybe have a separete commandline flag to generate instead of asking for input)
 // - Figure out if we need the addresses printed, consider a separate option to just print addresses then exit
@@ -59,7 +59,7 @@ func main() {
 		pass = envPass
 	}
 	if len(pass) == 0 {
-		// TODO: generate
+		pass = genPassword()
 	} else if len(pass) <= 10 {
 		log.Println("WARNING: password is recommended to be longer than 10 bytes")
 	}
@@ -99,7 +99,7 @@ func main() {
 	log.Fatalln(server.ListenAndServeTLS("cert.pem", "key.pem"))
 }
 
-func randomPassword(length int) string {
+func genPassword() string {
 	return ""
 }
 
