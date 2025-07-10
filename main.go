@@ -19,7 +19,7 @@ import (
 )
 
 // TODO:
-// - Support credentials from an env or file
+// - Support credentials from env (KUBARU_USER, KUBARU_PASS)
 // - Tidy up command line arguments, usage, user/password setting.
 // - improve network stuff (cleaner tls generation, generate based on actual ips? Maybe have a separete commandline flag to generate instead of asking for input)
 // - Figure out if we need the addresses printed, consider a separate option to just print addresses then exit
@@ -32,13 +32,14 @@ import (
 func main() {
 	// Flags
 	var host, port, path, user, pass string
-	flag.StringVar(&host, "host", "::", "host address to listen on")
-	flag.StringVar(&port, "port", "443", "port to listen on")
-	flag.StringVar(&path, "path", "", "path to directory to serve")
-	flag.StringVar(&user, "user", "viewer", "username for basic auth")
-	flag.StringVar(&pass, "pass", "", "password for basic auth")
+	flag.StringVar(&host, "host", "::", "Host address to listen on")
+	flag.StringVar(&port, "port", "443", "Port to listen on")
+	flag.StringVar(&path, "path", "", "Path to directory to serve (required)")
+	flag.StringVar(&user, "user", "user", "Username for basic auth")
+	flag.StringVar(&pass, "pass", "", "Password for basic auth. Generate random password if not set")
 	flag.Parse()
 
+	// Check media files
 	mediaFiles, err := generateMediaList(filepath.Clean(path))
 	if err != nil {
 		log.Fatalln("path must point to a valid directory:", err)
@@ -47,8 +48,20 @@ func main() {
 		log.Fatalln("provided path does not contain any valid media files")
 	}
 
-	if len(pass) <= 8 {
-		log.Println("WARNING: password is recommended to be longer than 8 characters")
+	// Check authentication credentials
+	if envUser := os.Getenv("KUBARU_USER"); len(envUser) != 0 {
+		user = envUser
+	}
+	if strings.ContainsRune(user, ':') {
+		log.Fatalln("username cannot contain a colon")
+	}
+	if envPass := os.Getenv("KUBARU_PASS"); len(envPass) != 0 {
+		pass = envPass
+	}
+	if len(pass) == 0 {
+		// TODO: generate
+	} else if len(pass) <= 10 {
+		log.Println("WARNING: password is recommended to be longer than 10 bytes")
 	}
 
 	_, err1 := os.Stat("cert.pem")
@@ -84,6 +97,10 @@ func main() {
 
 	log.Println("Listening on", server.Addr)
 	log.Fatalln(server.ListenAndServeTLS("cert.pem", "key.pem"))
+}
+
+func randomPassword(length int) string {
+	return ""
 }
 
 // Generate a list of the paths all media in the provided directory, filtering by extension.
