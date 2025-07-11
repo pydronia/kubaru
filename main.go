@@ -21,11 +21,14 @@ import (
 )
 
 // TODO:
-// - Tidy up command line arguments, usage, user/password setting.
 // - improve network stuff (cleaner tls generation, generate based on actual ips? Maybe have a separete commandline flag to generate instead of asking for input)
 // - Figure out if we need the addresses printed, consider a separate option to just print addresses then exit
 // - Rate limiting for authentication
-// - Nice logging/bandwidth monitoring
+// - Write usage (-h flag)
+// - Clean up/refactor code (packages maybe)
+// - Write readme, add licence, other github stuff
+// - make public
+// - Nice logging/bandwidth monitoring (colors!)
 // - Support changing directory contents
 // - Make simple homepage with instructions (maybe)
 // - Playback syncing service (write vlc, mpv plugin)
