@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
 	"flag"
 	"fmt"
@@ -19,7 +21,6 @@ import (
 )
 
 // TODO:
-// - Write random password generator
 // - Tidy up command line arguments, usage, user/password setting.
 // - improve network stuff (cleaner tls generation, generate based on actual ips? Maybe have a separete commandline flag to generate instead of asking for input)
 // - Figure out if we need the addresses printed, consider a separate option to just print addresses then exit
@@ -39,15 +40,6 @@ func main() {
 	flag.StringVar(&pass, "pass", "", "Password for basic auth. Generate random password if not set")
 	flag.Parse()
 
-	// Check media files
-	mediaFiles, err := generateMediaList(filepath.Clean(path))
-	if err != nil {
-		log.Fatalln("path must point to a valid directory:", err)
-	}
-	if len(mediaFiles) == 0 {
-		log.Fatalln("provided path does not contain any valid media files")
-	}
-
 	// Check authentication credentials
 	if envUser := os.Getenv("KUBARU_USER"); len(envUser) != 0 {
 		user = envUser
@@ -59,9 +51,20 @@ func main() {
 		pass = envPass
 	}
 	if len(pass) == 0 {
-		pass = genPassword()
+		randBuff := make([]byte, 12)
+		rand.Read(randBuff)
+		pass = base64.RawURLEncoding.EncodeToString(randBuff)
 	} else if len(pass) <= 10 {
 		log.Println("WARNING: password is recommended to be longer than 10 bytes")
+	}
+
+	// Check media files
+	mediaFiles, err := generateMediaList(filepath.Clean(path))
+	if err != nil {
+		log.Fatalln("path must point to a valid directory:", err)
+	}
+	if len(mediaFiles) == 0 {
+		log.Fatalln("provided path does not contain any valid media files")
 	}
 
 	_, err1 := os.Stat("cert.pem")
@@ -97,10 +100,6 @@ func main() {
 
 	log.Println("Listening on", server.Addr)
 	log.Fatalln(server.ListenAndServeTLS("cert.pem", "key.pem"))
-}
-
-func genPassword() string {
-	return ""
 }
 
 // Generate a list of the paths all media in the provided directory, filtering by extension.
