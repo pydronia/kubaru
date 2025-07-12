@@ -33,14 +33,27 @@ import (
 // - Make simple homepage with instructions (maybe)
 // - Playback syncing service (write vlc, mpv plugin)
 
+// test
+// kubaru
+// kubaru gen-cert localhost,127.0.0.1
+
 func main() {
+	if len(os.Args) >= 2 && os.Args[1] == "gen-cert" {
+		var hosts string
+		genCertFlags := flag.NewFlagSet("gen-cert", flag.ExitOnError)
+		genCertFlags.StringVar(&hosts, "hosts", "", "Comma separated list of hosts to add to TLS certificate. Adds loopback addresses and public IPv4 address by default")
+		genCertFlags.Parse(os.Args[2:])
+		// fmt.Println(err)
+
+	}
+
 	// Flags
 	var host, port, path, user, pass string
 	flag.StringVar(&host, "host", "::", "Host address to listen on")
 	flag.StringVar(&port, "port", "443", "Port to listen on")
 	flag.StringVar(&path, "path", "", "Path to directory to serve (required)")
 	flag.StringVar(&user, "user", "user", "Username for basic auth")
-	flag.StringVar(&pass, "pass", "", "Password for basic auth. Generate random password if not set")
+	flag.StringVar(&pass, "pass", "", "Password for basic auth. Generate random password by default")
 	flag.Parse()
 
 	// Check authentication credentials
