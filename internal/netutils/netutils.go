@@ -122,27 +122,3 @@ func GenerateTlsCert(hosts string) error {
 	log.Print("Wrote key.pem\n")
 	return nil
 }
-
-func PrintUnicastAddresses() error {
-	// Go through interfaces
-	ifaces, err := net.Interfaces()
-	if err != nil {
-		return fmt.Errorf("Error getting interfaces: %w", err)
-	}
-
-	fmt.Println("Valid unicast addresses:")
-	for _, iface := range ifaces {
-		addresses, err := iface.Addrs()
-		if err != nil {
-			continue
-		}
-		for _, address := range addresses {
-			ipnet, ok := address.(*net.IPNet)
-			if ok && ipnet.IP.IsGlobalUnicast() {
-				fmt.Println(" ", ipnet.IP)
-			}
-		}
-	}
-	fmt.Println()
-	return nil
-}

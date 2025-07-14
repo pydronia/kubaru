@@ -21,11 +21,8 @@ import (
 )
 
 // TODO:
-// - improve network stuff (cleaner tls generation, generate based on actual ips? Maybe have a separete commandline flag to generate instead of asking for input)
-// - Figure out if we need the addresses printed, consider a separate option to just print addresses then exit
-// - Rate limiting for authentication
-// - Write usage (-h flag)
 // - Clean up/refactor code (packages maybe)
+// - Rate limiting for authentication
 // - Write readme, add licence, other github stuff
 // - make public
 // - Nice logging/bandwidth monitoring (colors!)
@@ -33,27 +30,43 @@ import (
 // - Make simple homepage with instructions (maybe)
 // - Playback syncing service (write vlc, mpv plugin)
 
-// test
-// kubaru
-// kubaru gen-cert localhost,127.0.0.1
-
 func main() {
-	if len(os.Args) >= 2 && os.Args[1] == "gen-cert" {
-		var hosts string
-		genCertFlags := flag.NewFlagSet("gen-cert", flag.ExitOnError)
-		genCertFlags.StringVar(&hosts, "hosts", "", "Comma separated list of hosts to add to TLS certificate. Adds loopback addresses and public IPv4 address by default")
-		genCertFlags.Parse(os.Args[2:])
-		// fmt.Println(err)
-
-	}
-
 	// Flags
-	var host, port, path, user, pass string
+	// main flags
+	var path, host, port, user, pass string
+	flag.StringVar(&path, "path", "", "Path to directory to serve (required)")
 	flag.StringVar(&host, "host", "::", "Host address to listen on")
 	flag.StringVar(&port, "port", "443", "Port to listen on")
-	flag.StringVar(&path, "path", "", "Path to directory to serve (required)")
 	flag.StringVar(&user, "user", "user", "Username for basic auth")
 	flag.StringVar(&pass, "pass", "", "Password for basic auth. Generate random password by default")
+
+	// gen-cert flags
+	var hosts string
+	genCertFlags := flag.NewFlagSet("gen-cert", flag.ExitOnError)
+	genCertFlags.StringVar(&hosts, "hosts", "localhost,127.0.0.1,::1", "Comma separated list of hosts to add to TLS certificate.")
+
+	// Usage function
+	flag.Usage = func() {
+		fmt.Println("Usage for kubaru:")
+		fmt.Println("  kubaru [flags]")
+		fmt.Println("  kubaru gen-cert [flags]")
+		fmt.Println("\nA simple https fileserver designed for easily sharing media files.")
+		fmt.Println("Generate a self-signed TLS certificate with gen-cert, and start the server with `kubaru [flags]`.")
+		fmt.Println("\nFlags:")
+		flag.PrintDefaults()
+		fmt.Println("\ngen-cert flags:")
+		genCertFlags.PrintDefaults()
+	}
+
+	// gen-cert subcommand
+	if len(os.Args) >= 2 && os.Args[1] == "gen-cert" {
+		genCertFlags.Parse(os.Args[2:])
+		if err := netutils.GenerateTlsCert(hosts); err != nil {
+			log.Fatalln(err)
+		}
+		return
+	}
+
 	flag.Parse()
 
 	// Check authentication credentials
@@ -80,20 +93,17 @@ func main() {
 		log.Fatalln("path must point to a valid directory:", err)
 	}
 	if len(mediaFiles) == 0 {
-		log.Fatalln("provided path does not contain any valid media files")
+		log.Println("WARNING: provided path does not contain any valid media files")
 	}
 
+	// Check TLS cert
 	_, err1 := os.Stat("cert.pem")
 	_, err2 := os.Stat("key.pem")
 	if errors.Is(err1, os.ErrNotExist) || errors.Is(err2, os.ErrNotExist) {
-		fmt.Print("TLS cert not found. Enter comma-separated IPs/domains to generate for: ")
-		var hosts string
-		fmt.Scanln(&hosts)
-		if err := netutils.GenerateTlsCert(hosts); err != nil {
-			log.Fatalln(err)
-		}
+		log.Fatalln("TLS cert not found. Please run `kubaru gen-cert`.")
 	}
 
+	// Start server
 	server := &http.Server{
 		Addr:         net.JoinHostPort(host, port),
 		ReadTimeout:  time.Second * 5,
@@ -114,7 +124,9 @@ func main() {
 		http.Redirect(w, r, "/playlist.m3u8", http.StatusSeeOther)
 	})))
 
-	log.Println("Listening on", server.Addr)
+	fmt.Printf("Username: %s\nPassword: %s\n\n", user, pass)
+	fmt.Printf("Now listening on %s\n", server.Addr)
+	fmt.Printf("Access the media playlist locally at https://%s:%s@localhost:%s/", user, pass, port)
 	log.Fatalln(server.ListenAndServeTLS("cert.pem", "key.pem"))
 }
 
