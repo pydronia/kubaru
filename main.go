@@ -70,7 +70,7 @@ func main() {
 
 	flag.Parse()
 
-	// Check authentication credentials
+	// Validate authentication credentials
 	if envUser := os.Getenv("KUBARU_USER"); len(envUser) != 0 {
 		user = envUser
 	}
@@ -89,7 +89,11 @@ func main() {
 	}
 
 	// Check media files
-	mediaFiles, err := generateMediaList(filepath.Clean(path))
+	root, err := os.OpenRoot(filepath.Clean(path))
+	if err != nil {
+	}
+
+	mediaFiles, err := generateMediaList(path)
 	if err != nil {
 		log.Fatalln("path must point to a valid directory:", err)
 	}
@@ -131,10 +135,10 @@ func main() {
 	log.Fatalln(server.ListenAndServeTLS("cert.pem", "key.pem"))
 }
 
-// Generate a list of the paths all media in the provided directory, filtering by extension.
+// Generate a list of the paths all media in the provided filesystem, filtering by extension.
 // Skips dot-prefixed files and folders. Currently uses a hardcoded list of common audio and video extensions.
 // TODO: add flag for including extra extensions.
-func generateMediaList(rootPath string) ([]string, error) {
+func generateMediaList(fsys fs.FS) ([]string, error) {
 	var files []string
 	allowedExts := map[string]struct{}{
 		".webm": {},
@@ -159,12 +163,7 @@ func generateMediaList(rootPath string) ([]string, error) {
 		".opus": {},
 		".wav":  {},
 	}
-	root, err := os.OpenRoot(rootPath)
-	if err != nil {
-		return nil, err
-	}
-	defer root.Close()
-	err = fs.WalkDir(root.FS(), ".", func(path string, d fs.DirEntry, err error) error {
+	err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
