@@ -1,3 +1,3 @@
 # kubaru
 
-This project is a work in Progress. Come back soon!
+This project is a work in progress. Come back soon!
