@@ -1,3 +1,6 @@
+/*
+Package config handles the creation and validation of the config for the Kubaru server.
+*/
 package config
 
 import (
@@ -14,11 +17,15 @@ import (
 	"github.com/pydronia/kubaru/internal/tlsutils"
 )
 
+// A KubaruConfig instance stores all the information required
+// to start a Kubaru file server.
+// This struct should only be created through [NewConfig].
 type KubaruConfig struct {
 	User, Pass, Host, Port, Path string
 	MediaFiles                   []string
 }
 
+// Create a new KubaruConfig and validate the provided values
 func NewConfig(user, pass, host, port, path string) (KubaruConfig, error) {
 	cfg := KubaruConfig{
 		User: user,
@@ -42,6 +49,8 @@ func NewConfig(user, pass, host, port, path string) (KubaruConfig, error) {
 	return cfg, nil
 }
 
+// Check that the provided credentials are valid. If none are supplied,
+// generate some sensible defaults.
 func (cfg *KubaruConfig) validateCredentials() error {
 	if cfg.User == "" {
 		cfg.User = os.Getenv("KUBARU_USER")
@@ -66,6 +75,8 @@ func (cfg *KubaruConfig) validateCredentials() error {
 	return nil
 }
 
+// Ensure that [KubaruConfig.Path] correctly points to a directory,
+// and sets the config's slice of valid media files.
 func (cfg *KubaruConfig) validateMediaPath() error {
 	if cfg.Path == "" {
 		return errors.New("no path provided")

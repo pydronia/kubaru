@@ -1,3 +1,7 @@
+/*
+Package server includes the required functions to
+start a file server with the provided config.
+*/
 package server
 
 import (
@@ -14,6 +18,7 @@ import (
 	"github.com/pydronia/kubaru/internal/config"
 )
 
+// Start a server for Kubaru with the provided [config.KubaruConfig].
 func StartServer(cfg *config.KubaruConfig) error {
 	server := &http.Server{
 		Addr:         net.JoinHostPort(cfg.Host, cfg.Port),
@@ -52,6 +57,8 @@ func generateM3uFile(url string, mediaFiles []string) string {
 	return builder.String()
 }
 
+// Returns a [http.Handler] that ensures that the incoming request includes authorization
+// with HTTP Basic Authentication, with the provided credentials user and pass.
 func basicAuthMiddleware(user, pass string, handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")

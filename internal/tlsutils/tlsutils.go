@@ -1,3 +1,6 @@
+/*
+Package tlsutils provides a simple way to generate self-signed TLS certificates.
+*/
 package tlsutils
 
 import (
@@ -17,6 +20,8 @@ import (
 	"time"
 )
 
+// Generate a x509 certificate and private key, including all the domains and/or
+// IP addresses in the comma-separated string hosts.
 func GenerateTLSCert(hosts string) error {
 	// Most of this code is from https://go.dev/src/crypto/tls/generate_cert.go
 	// Generate private key
@@ -90,6 +95,7 @@ func GenerateTLSCert(hosts string) error {
 	return nil
 }
 
+// Checks the existance of a TLS certificate in the working directory.
 func CheckTLSCert() error {
 	_, err1 := os.Stat("cert.pem")
 	_, err2 := os.Stat("key.pem")
