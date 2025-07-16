@@ -1,56 +1,23 @@
-package netutils
+package tlsutils
 
 import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"crypto/subtle"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"encoding/base64"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"log"
 	"math/big"
 	"net"
-	"net/http"
 	"os"
 	"strings"
 	"time"
 )
 
-func BasicAuthMiddleware(user, pass string, handler http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
-			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted", charset="UTF-8"`)
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-
-		b64, ok := strings.CutPrefix(authHeader, "Basic ")
-		if !ok {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-
-		decodedBytes, err := base64.StdEncoding.DecodeString(b64)
-		if err != nil {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-
-		correctCredentials := []byte(user + ":" + pass)
-		if subtle.ConstantTimeCompare(correctCredentials, decodedBytes) == 0 {
-			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted", charset="UTF-8"`)
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-		handler.ServeHTTP(w, r)
-	})
-}
-
-func GenerateTlsCert(hosts string) error {
+func GenerateTLSCert(hosts string) error {
 	// Most of this code is from https://go.dev/src/crypto/tls/generate_cert.go
 	// Generate private key
 	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
@@ -120,5 +87,14 @@ func GenerateTlsCert(hosts string) error {
 		return fmt.Errorf("Error closing key.pem: %w", err)
 	}
 	log.Print("Wrote key.pem\n")
+	return nil
+}
+
+func CheckTLSCert() error {
+	_, err1 := os.Stat("cert.pem")
+	_, err2 := os.Stat("key.pem")
+	if errors.Is(err1, os.ErrNotExist) || errors.Is(err2, os.ErrNotExist) {
+		return errors.New("TLS cert not found. Please run `kubaru gen-cert`.")
+	}
 	return nil
 }
