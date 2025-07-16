@@ -20,10 +20,10 @@ import (
 )
 
 // TODO:
-// - Rate limiting for authentication
-// - Write readme, add licence, other github stuff
+// - Write readme, add licence, lots of other github stuff (issues, branches, releases, versioning...)
 // - make public
 // - Nice logging/bandwidth monitoring (colors!)
+// - Rate limiting for authentication
 // - Support changing directory contents
 // - Make simple homepage with instructions (maybe)
 // - support custom cert location
