@@ -1,5 +1,5 @@
 /*
-Package config handles the creation and validation of the config for the Kubaru server.
+Package config handles the creation and validation of the config for the kubaru server.
 */
 package config
 
@@ -18,7 +18,7 @@ import (
 )
 
 // A KubaruConfig instance stores all the information required
-// to start a Kubaru file server.
+// to start a kubaru file server.
 // This struct should only be created through [NewConfig].
 type KubaruConfig struct {
 	User, Pass, Host, Port, Path string

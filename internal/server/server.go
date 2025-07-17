@@ -18,7 +18,7 @@ import (
 	"github.com/pydronia/kubaru/internal/config"
 )
 
-// Start a server for Kubaru with the provided [config.KubaruConfig].
+// Start a server for kubaru with the provided [config.KubaruConfig].
 func StartServer(cfg *config.KubaruConfig) error {
 	server := &http.Server{
 		Addr:         net.JoinHostPort(cfg.Host, cfg.Port),
