@@ -42,7 +42,7 @@ func StartServer(cfg *config.KubaruConfig) error {
 
 	fmt.Printf("Username: %s\nPassword: %s\n\n", cfg.User, cfg.Pass)
 	fmt.Printf("Now listening on %s\n", server.Addr)
-	fmt.Printf("Access the media playlist locally at https://%s:%s@localhost:%s/", cfg.User, cfg.Pass, cfg.Port)
+	fmt.Printf("Access the media playlist locally at https://%s:%s@localhost:%s/\n", cfg.User, cfg.Pass, cfg.Port)
 	return server.ListenAndServeTLS("cert.pem", "key.pem")
 }
 
