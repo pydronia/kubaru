@@ -63,7 +63,7 @@ Currently, I'm not distributing binaries. Thankfully, it's very straightforward 
 
 ## Client Usage
 
-I recommend using [MPV](https://mpv.io/) for the best support, but connecting to kubaru should work with most modern media players that support HTTPS streams.
+I recommend using [mpv](https://mpv.io/) for the best support, but connecting to kubaru should work with most modern media players that support HTTPS streams.
 
 Connecting is as simple as opening the following URL in your media player:
 ```

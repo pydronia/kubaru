@@ -20,8 +20,6 @@ import (
 )
 
 // TODO:
-// - Write readme, add licence, lots of other github stuff (issues, branches, releases, versioning...)
-// - make public
 // - Nice logging/bandwidth monitoring (colors!)
 // - Rate limiting for authentication
 // - Support changing directory contents
