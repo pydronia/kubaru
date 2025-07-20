@@ -5,8 +5,11 @@ It is designed to work with existing media players as clients, providing a flexi
 
 ---
 
-I often watched movies and shows with friends over voice chat and screen-sharing platforms, but found the experience lacking due to bitrate and resolution constraints.
-What if one person wanted to watch with the Japanese audio, while another had a worse opinion? For everyone to have a quality experience, it would often turn into annoying charades of sharing files
+> [!NOTE]
+> This project is still a work in progress
+
+I often watch movies and shows with friends over voice chat and screen-sharing platforms, but find the experience lacking due to bitrate and resolution constraints.
+What if one person wants to watch with the Japanese audio, while another had a worse opinion? For everyone to have a quality experience, it would often turn into annoying charades of sharing files
 or sourcing streams between people of varying technical literacy.
 
 Full-featured media servers seemed overkill for this problem, when I just wanted a lightweight way to share raw media files from my own machine with friends without requiring media indexing, transcoding, or a complicated configuration.
